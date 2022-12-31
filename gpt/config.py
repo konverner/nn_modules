@@ -8,7 +8,12 @@ DROPOUT = 0.1
 # training config
 WEIGHT_DECAY = 0.001
 BATCH_SIZE = 32
-N_EPOCHS = 100
+N_EPOCHS = 2000
+LR = 0.00001
+WEIGHT_DECAY = 0.
+LOG_EVERY_N = 500
 
 # paths
 DATA_PATH = 'names.txt'
+SAVE_MODEL_PATH = ''
+LOAD_MODEL_PATH = ''
