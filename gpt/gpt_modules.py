@@ -17,6 +17,11 @@ class ScaledDotProductAttention(nn.Module):
                                  .view(1, 1, 512, 512))
 
     def forward(self, q, k, v):
+        """
+        q : tensor [batch_size, heads, length, d_model//heads]
+        k : tensor [batch_size, heads, length, d_model//heads]
+        v : tensor [batch_size, heads, length, d_model//heads]
+        """
         d_k = k.shape[-1]
         scores = (q @ k.transpose(-2, -1)) * math.sqrt(d_k)
         if self.masked:
@@ -33,7 +38,8 @@ class MultiHeadAttention(nn.Module):
         ---
         heads : number of heads
         d_model : model dimension (embeddings size)
-        dropout :
+        dropout : dropout probability
+        masked : is attention masked or not
         """
         super().__init__()
 
@@ -61,7 +67,7 @@ class MultiHeadAttention(nn.Module):
         output : [batch_size, length, emb_dim]
         """
         bs = q.size(0)
-        # perform linear operation, split into h heads and get [bs, h, length, d_model]
+        # perform linear operation, split into h heads and get [bs, h, length, d_k]
         k = self.k_linear(k).view(bs, -1, self.h, self.d_k).transpose(1, 2)
         q = self.q_linear(q).view(bs, -1, self.h, self.d_k).transpose(1, 2)
         v = self.v_linear(v).view(bs, -1, self.h, self.d_k).transpose(1, 2)
