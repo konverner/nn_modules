@@ -23,7 +23,7 @@ class ScaledDotProductAttention(nn.Module):
         v : tensor [batch_size, heads, length, d_model//heads]
         """
         d_k = k.shape[-1]
-        scores = (q @ k.transpose(-2, -1)) * math.sqrt(d_k)
+        scores = (q @ k.transpose(-2, -1)) / math.sqrt(d_k)
         if self.masked:
             scores = scores.masked_fill(self.mask[:, :, :q.shape[2], :q.shape[2]] == 0, float('-inf'))
         scores = torch.softmax(scores, dim=-1)
