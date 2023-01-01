@@ -17,11 +17,6 @@ class ScaledDotProductAttention(nn.Module):
                                  .view(1, 1, 512, 512))
 
     def forward(self, q, k, v):
-        """
-        q : tensor [batch_size, heads, length, d_model//heads]
-        k : tensor [batch_size, heads, length, d_model//heads]
-        v : tensor [batch_size, heads, length, d_model//heads]
-        """
         d_k = k.shape[-1]
         scores = (q @ k.transpose(-2, -1)) / math.sqrt(d_k)
         if self.masked:
@@ -32,14 +27,13 @@ class ScaledDotProductAttention(nn.Module):
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, heads: int, d_model: int, dropout: float = 0.1, masked: bool = False):
+    def __init__(self, heads: int, d_model: int, dropout: float = 0.1, masked: bool=False):
         """
         params
         ---
         heads : number of heads
         d_model : model dimension (embeddings size)
-        dropout : dropout probability
-        masked : is attention masked or not
+        dropout :
         """
         super().__init__()
 
@@ -67,11 +61,12 @@ class MultiHeadAttention(nn.Module):
         output : [batch_size, length, emb_dim]
         """
         bs = q.size(0)
-        # perform linear operation, split into h heads and get [bs, h, length, d_k]
+        # perform linear operation, split into h heads and get [bs, h, length, d_model]
         k = self.k_linear(k).view(bs, -1, self.h, self.d_k).transpose(1, 2)
         q = self.q_linear(q).view(bs, -1, self.h, self.d_k).transpose(1, 2)
         v = self.v_linear(v).view(bs, -1, self.h, self.d_k).transpose(1, 2)
 
+        # calculate attention using function we will define next
         scores = self.attention(q, k, v)
 
         # concatenate heads and put through final linear layer
@@ -84,8 +79,8 @@ class FeedForward(nn.Module):
     def __init__(self, d_model: int, d_ff: int = 2048, dropout: float = 0.1):
         super().__init__()
         self.linear_1 = nn.Linear(d_model, d_ff)
-        self.linear_2 = nn.Linear(d_ff, d_model)
         self.dropout = nn.Dropout(dropout)
+        self.linear_2 = nn.Linear(d_ff, d_model)
         self.act = torch.nn.GELU()
 
     def forward(self, x):
@@ -116,7 +111,7 @@ class DecoderLayer(nn.Module):
         self.norm_2 = Norm(d_model)
         self.dp = nn.Dropout(dropout)
         self.attn = MultiHeadAttention(heads, d_model, dropout, masked=True)
-        self.ff = FeedForward(d_model, d_ff=d_ff)
+        self.ff = FeedForward(d_model, d_ff = d_ff)
 
     def forward(self, x):
         x = self.norm_1(x + self.dp(self.attn(x, x, x)))
@@ -132,7 +127,8 @@ class GPT(nn.Module):
                  heads: int,
                  d_ff: int = 2048,
                  dropout: float = 0.1,
-                 max_length: int = 128):
+                 max_length: int = 128,
+                 device: str = 'cpu'):
         """
         params
         ---
@@ -143,14 +139,17 @@ class GPT(nn.Module):
         d_ff : embeddings size in decoder's feed forward NN
         dropout : probability of dropout
         max_length : maximum length of token sequence
+        device : cpu or cuda
         """
         super().__init__()
+        self.device = device
         self.max_length = max_length
         self.embedder = nn.Embedding(vocab_size, d_model)
         self.pe = nn.Embedding(max_length, d_model)
         self.layers = nn.ModuleList([DecoderLayer(d_model, heads, dropout, d_ff) for _ in range(n_layers)])
         self.ff = nn.Linear(d_model, vocab_size)
         self.sm = nn.Softmax(dim=1)
+        self.to(device)
 
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
@@ -159,10 +158,25 @@ class GPT(nn.Module):
         """
         tokens : [bs, length]
         """
-        pos = torch.arange(0, tokens.shape[1], dtype=torch.long).unsqueeze(0)
+        pos = torch.arange(0, tokens.shape[1], dtype=torch.long).unsqueeze(0).to(self.device)
         x = self.embedder(tokens) + self.pe(pos)
         for layer in self.layers:
             x = layer(x)
         logits = self.ff(x)
-        probs = self.sm(logits)
-        return probs
+        return logits
+
+    @torch.no_grad()
+    def generate(self, idx, idx2token, k=3, temperature=1.0):
+      self.eval()
+      for _ in range(self.max_length):
+          logits = self(idx)
+          # pluck the probs at the final step and scale by desired temperature
+          logits = logits[:, -1, :] / temperature
+          probs = self.sm(logits)
+          probs, indicies = torch.topk(probs, k=k)
+          idx_next = indicies[0][torch.multinomial(probs, 1)[0][0]]
+          if idx2token[idx_next.item()] == '[STOP]':
+            break
+          idx = torch.cat((idx, idx_next[None][None]), dim=1)
+      result = [idx2token[i.item()] for i in idx[0] if i.item() not in {0, 1}]
+      return ''.join(result).strip()
