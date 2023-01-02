@@ -1,4 +1,4 @@
-# Generative Pre-trained Transformer
+## Generative Pre-trained Transformer
 
 Here is implementation in PyTorch of Generative Pre-trained Transformer (GPT) from the paper "Improving Language Understanding by Generative Pre-Training." 
 The implementation is not fully optimized to have great perfomance since the main purpose of the code is educative. The code is provided with test on a simple
@@ -6,9 +6,9 @@ name generation task accomplished on `names.txt` data.
 
 Detailed explanation of GPT theory and this implementation is avaliable on [Medium](https://medium.com/@konst.verner/gpt-explanation-and-implementation-from-scratch-in-pytorch-9962839417ac) and interective version of the code can be accessed via [Colab Notebook](https://colab.research.google.com/drive/1bxMkHVbRP0NRkEPU1FCadisDF3b8XP49?usp=sharing).  
 
-# Get started
+## Get started
 
-*Train*
+**Train**
 
 1) adjust configuration in `config.py`
 
@@ -16,7 +16,7 @@ Detailed explanation of GPT theory and this implementation is avaliable on [Medi
 
 3) run `train.py` script in a line command
 
-*Generation*
+**Generation**
 
 1) provide paths to model weights in (`*.pt`), vocabulary (`vocab.json`) and adjust other configurations if needed in `config.py` file
 
