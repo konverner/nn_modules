@@ -8,15 +8,19 @@ Detailed explanation of GPT theory and this implementation is avaliable on [Medi
 
 # Get started
 
-## Train
+*Train*
 
-First of all, adjust configuration in `config.py`. Secondly, prepare a dataset that contains one piece of text data per a line (see `names.txt`). Thirdly,
-run `train.py` script in a line command.
+1) adjust configuration in `config.py`
 
-## Generation
+2) prepare a dataset that contains one piece of text data per line (see `names.txt`)
 
-Firstly, provide model weights in (`*.pt`), vocabulary (`vocab.json`) and adjust other configurations if needed in `config.py` file. Secondly, run `generate.py` script in
-a line command providing a string to start with; to generate samples with random initial letters, do not provide any string.
+3) run `train.py` script in a line command
+
+*Generation*
+
+1) provide paths to model weights in (`*.pt`), vocabulary (`vocab.json`) and adjust other configurations if needed in `config.py` file
+
+2) run `generate.py` script in a line command providing a string to start with; to generate samples with random initial letters, do not provide any string.
 
 For example: having trained on `names.txt` model:
 
