@@ -76,12 +76,12 @@ if __name__ == '__main__':
             print(episode, loss_history[-1], reward_history[-1])
 
     agent.save_model(PATH_MODEL_SAVE + f'model_{loss_history[-1]}.pt')
-    print(f'Policy model save as {PATH_MODEL_SAVE + f"model_{loss_history[-1]}.pt"}')
+    print(f'Policy model has been saved as {PATH_MODEL_SAVE + f"model_{loss_history[-1]}.pt"}')
 
     fig, axs = plt.subplots(1, 2)
     fig.set_figheight(4), fig.set_figwidth(15)
 
-    axs[0].plot(range(N_EPISODES), reward_history), axs[0].set_title('average rewards')
+    axs[0].plot(range(N_EPISODES), reward_history), axs[0].set_title('average reward')
     axs[1].plot(range(N_EPISODES), loss_history), axs[1].set_title('average loss')
 
     plt.show()
