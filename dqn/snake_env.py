@@ -11,13 +11,6 @@ def distance(point1: List[int], point2: List[int]) -> int:
 
 
 class SnakeEnv:
-    """
-    An environment for Snake Game
-    
-    Actions are moves up, down, right, left. States are represented
-    as 4-dim vectors [x1, y1, x2, y2] where x1, y1 are coordiantes of
-    the snake's head and x2, y2 are coordinates of target (food).
-    """
     def __init__(self, size: Tuple[int, int]):
         self.size = size
         self.actions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
@@ -66,7 +59,7 @@ class SnakeEnv:
             reward = 1
             new_target = curr_target
         # agent is further away from target
-        elif np.linalg.norm(new_position - curr_target) > distance(curr_position, curr_target):
+        elif distance(new_position, curr_target) > distance(curr_position, curr_target):
             reward = -1
             new_target = curr_target
         else:
