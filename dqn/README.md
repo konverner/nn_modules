@@ -32,4 +32,4 @@ python train.py
 python test.py
 ```
 
-[](https://miro.medium.com/max/640/0*Uo1Lx_h_tlHY-My5.gif)
+![](https://miro.medium.com/max/640/0*Uo1Lx_h_tlHY-My5.gif)
