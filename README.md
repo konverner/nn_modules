@@ -6,4 +6,6 @@ In this repository I store my implements of neural networks modules from scratch
 
 * `cnn`: 1d convolution, 1d correlation
 
-*  `gpt`: multihead attention mechanism, decoder layer from transformer, gpt
+* `dqn`: deep q-learning neural network, memory replay
+
+* `gpt`: multihead attention mechanism, decoder layer from transformer, gpt
