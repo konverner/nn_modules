@@ -19,6 +19,7 @@ if __name__ == '__main__':
     loss_history = []
     reward_history = []
 
+    print('{:>12}  {:>12}  {:>12}'.format('episode', 'loss', 'reward'))
     for episode in range(N_EPISODES):
 
         loss_per_episode = 0.
@@ -73,7 +74,7 @@ if __name__ == '__main__':
         reward_history.append(round(BATCH_SIZE*reward_per_episode/N_STEPS, 4))
 
         if episode % LOG_EVERY_N == 0:
-            print(episode, loss_history[-1], reward_history[-1])
+            print('{:>12}  {:>12}  {:>12}'.format(episode, loss_history[-1], reward_history[-1]))
 
     agent.save_model(PATH_MODEL_SAVE + f'model_{loss_history[-1]}.pt')
     print(f'Policy model has been saved as {PATH_MODEL_SAVE + f"model_{loss_history[-1]}.pt"}')
